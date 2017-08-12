@@ -1,0 +1,197 @@
+* Music India Online Download script
+
+Who likes to downlaod music one by one we are too lazy , we script . This is a script i wrote to download music from [[http://mio.to/][MusicIndiaOnline]] . 
+This site contain a large repositories of Indian Music and the service is free . It plays the music in a custom player . 
+Opening the firefox web developer option and inspecting we could see the mp3 request links . intestingly there is pattern in the link
+
+> "~http://media-audio.mio.to/various_artists/A/Aashiqui 2 (2013)/1_1 - Tum Hi Ho-vbr-V5.mp3~"
+
+>  ~" http://media-audio.mio.to/by_artist/A/AR. Rahman/I (2014)/1_1 - Mersalaayitten-vbr-V5.mp3 "~
+
+by looking into the source html we could extract all the informations to create the link
+
+> ~"http://media-audio.mio.to/< by_artist or various_artists >/< first letter of album_id >/< album_id >/< disk_number >_< track_number > - < track_name >-vbr-V5.mp3 "~
+
+so we scrap the webpage using [[ https://www.crummy.com/software/BeautifulSoup/bs4/doc/ ][BeautifulSoup]] and extract all the details . the source contains the artwork link from which we can get
+wether it is ~by_artist~ or ~various_artists~ by search with Regular expression final we create the link and download the file to its 
+respective folder . the mp3 file downloaded does not contain any tag so we add them using a [[http://eyed3.nicfit.net/][eyed3]] which is a tag editor
+
+** Dowload Movie songs into the directory
+
+#+BEGIN_SRC python :tangle mio.py :async
+# Made by :  Nemesis
+# Discription :This downloads The songs from site named mio.to
+# syantax : python3 mio.py <link>
+# Requirements : python modules bs4,taglib
+# System Package : eyed3 [User for insterting artwork]
+
+import bs4,requests,sys,re,taglib,subprocess,os
+
+#Downloads the webpage and create a Beautifull Soup Object
+url=sys.argv[1]
+# url = "http://mio.to/album/Aashiqui+2+%282013%29"
+mio = requests.get(url)
+mio_soup = bs4.BeautifulSoup(mio.text,'html.parser')
+
+#Extracts some informations :
+
+movie_name = re.search(r".*?\([0-9]+\)",mio_soup.select('div.heading')[0].text).group(0)
+art_work = mio_soup.select('div.group.info > img["src"]')[0]["src"]
+year = re.search(r'\(([0-9][0-9]+)\)',movie_name).group(1)
+link = re.search(r'http://media-images.mio.to/(.*?)/(.*)/Art-350.jpg',art_work).group(1)
+artwork_path = movie_name+"/artwork.jpg"
+
+print("\nMovie Name : "+movie_name )
+# print("Music Director : "+music_director)
+
+subprocess.call(["mkdir" ,"-p",movie_name])
+
+#Downloading the artwork
+if not os.path.exists(artwork_path):
+    subprocess.call(["wget","-c",art_work,"-O",artwork_path])
+
+#Finds all the songs links and downloads the and inserts the tags
+
+for i in mio_soup.find_all("tr" ,{"class" : "song-link"}):
+    artist = ",".join(re.findall('"(.*?)"',i['track_artist']))
+    album_name = movie_name
+    track_number = i["track_number"]
+    disk_number = i["disc_number"]
+    track_name = i["track_name"]
+    path = album_name+"/"+track_name+".mp3"
+    #Create the download links of the mp3
+    mp3_link = "http://media-audio.mio.to/"+link+"/"+i["album_id"][0]+"/"+i["album_id"]+"/"+disk_number+"_"+track_number+" - "+track_name+"-vbr-V5.mp3"
+    print("Downloading ",track_name,"  ...")
+    # if not os.path.exists(path):
+    subprocess.call(["wget","-c",mp3_link,"-O",path])
+    # Inserting the tag details
+    command = ["eyeD3","--add-image",artwork_path+":FRONT_COVER",path,"-a",artist,"-A",album_name,"-t",track_name,"-n",track_number,"-Y",year]
+    subprocess.call(command)
+
+#+END_SRC
+
+#+BEGIN_SRC shell :async
+python3 mio.py http://mio.to/album/Afzal+Yusuff/Theeram+%282017%29 
+#+END_SRC
+
+#+RESULTS:
+: 9f107ea289dcc9e096ebd89b497373a9
+
+** Some Code snippet
+*** New Release From Hindi Malayalam amd Tamil
+#+BEGIN_SRC python  :tangle new.py :results output :async
+  import bs4,requests
+
+  url = ["http://mio.to/Malayalam/Movie+Songs", "http://mio.to/Hindi/Movie+Songs","http://mio.to/Tamil/Movie+Songs"]
+  for i in url:
+      mio = requests.get(i)
+      mio_soup = bs4.BeautifulSoup(mio.text,"html.parser")
+      for i in mio_soup.find_all('div', {'id' : '#trending-now'}):
+          for j in i.select("a"):
+               print(j.find("h2").text+"\t http://mio.to" + j["href"])
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+Theeram	 http://mio.to/album/Afzal+Yusuff/Theeram+%282017%29
+Take Off	 http://mio.to/album/Divya+S.+Menon%2C+Gopi+Sundar%2C+Muhammed+Maqbool+Manzoor/Take+Off+%282017%29
+Cia - Comrade In America	 http://mio.to/album/Cia+-+Comrade+In+America+%282017%29
+Ayaal Sassi	 http://mio.to/album/Vineeth+Sreenivasan/Ayaal+Sassi+%282017%29
+Ramante Edanthottam	 http://mio.to/album/Bijibal/Ramante+Edanthottam+%282017%29
+Achayans	 http://mio.to/album/Ratheesh+Vega/Achayans+%282017%29
+Pling	 http://mio.to/album/Sreejith+Edavana/Pling+%282017%29
+Bahubali 2 - The Conclusion	 http://mio.to/album/Swetha+Mohan/Bahubali+2+-+The+Conclusion+%282017%29
+Utharam Parayaathe	 http://mio.to/album/Nandhu+Kartha/Utharam+Parayaathe+%282017%29
+Sakhavu	 http://mio.to/album/Prashant+Pillai/Sakhavu+%282017%29
+Love U Family	 http://mio.to/album/Vishnu+Narayan/Love+U+Family+%282017%29
+Tubelight	 http://mio.to/album/Akashdeep+Sengupta%2C+Amit+Mishra%2C+Kamaal+Khan/Tubelight+%282017%29
+Sweetiee Weds NRI	 http://mio.to/album/Palash+Muchhal/Sweetiee+Weds+NRI+%282017%29
+Bank Chor	 http://mio.to/album/Ambili%2C+Kailash+Kher/Bank+Chor+%282017%29
+Dear Maya	 http://mio.to/album/Rashi+Mal/Dear+Maya+%282017%29
+Dobaara	 http://mio.to/album/Arko%2C+Asees+Kaur/Dobaara+%282017%29
+Bachche Kachche Sachche	 http://mio.to/album/Ravi+Shankar+S/Bachche+Kachche+Sachche+%282017%29
+Behen Hogi Teri	 http://mio.to/album/Arijit+Singh/Behen+Hogi+Teri+%282017%29
+Perfect Plan	 http://mio.to/album/Perfect+Plan+%282017%29
+Play This	 http://mio.to/album/Sourabh+Shrivastav/Play+This+%282017%29
+Yaarivan	 http://mio.to/album/Deepak/Yaarivan+%282017%29
+Brindhaavanam	 http://mio.to/album/Vishal+Chandrashekhar/Brindhaavanam+%282017%29
+Lens	 http://mio.to/album/Harini/Lens+%282017%29
+Yendha Nerathilum	 http://mio.to/album/Yendha+Nerathilum+%282017%29
+Thunigaram	 http://mio.to/album/Shan+Gokul/Thunigaram+%282017%29
+Graghanam	 http://mio.to/album/Sundaramurthy+KS/Graghanam+%282017%29
+Vilaiyada Vaa	 http://mio.to/album/Arun+Prasath/Vilaiyada+Vaa+%282017%29
+Yenda Thalaiyila Yenna Vekkala	 http://mio.to/album/AR.+Rehana/Yenda+Thalaiyila+Yenna+Vekkala+%282017%29
+Yeidhavan	 http://mio.to/album/Paartav+Barggo/Yeidhavan+%282017%29
+Sangili Bungili Kadhava Thorae	 http://mio.to/album/Vishal+Chandrashekhar/Sangili+Bungili+Kadhava+Thorae+%282017%29
+#+end_example
+
+*** List all movies in that catagory
+#+BEGIN_SRC python :tangle list.py :async
+import requests,bs4,sys
+url = sys.argv[1]
+while True:
+      mio = requests.get(url)
+      mio_soup = bs4.BeautifulSoup(mio.text,'html.parser')
+      for i in mio_soup.find_all("a" , {"class" : "img-cover-175"}):
+            print("http://mio.to"+i["href"])
+      try:
+          url = "http://mio.to" + mio_soup.find_all("a" , {"class" : "next-page"})[0]["href"]
+      except IndexError:
+                exit()
+#+END_SRC
+
+** Grand Finale
+scraping the webpage and getting all the list of movie songs .
+#+BEGIN_SRC shell :tangle list.sh 
+mkdir {Hindi,Malayalam,Tamil}  Hindi/{19{3..9}0,20{0,1}0}s  Tamil/{19{3..9}0,20{0,1}0}s  Malayalam/{19{5..9}0,20{0,1}0}s
+for i in {Hindi,Malayalam,Tamil} ; do
+    cd $i
+    for j in *; do
+        cd $j
+        echo listing $i/$j ...
+        python3 ../../list.py http://mio.to/$i/Movie+Songs/albums/decade/`echo $j | sed -r 's/([0-9]+)s/\1/'` >> list 
+        sleep 1s
+        echo 1 > count
+        cd ..
+    done
+    cd ..
+done
+#+END_SRC
+
+
+As all the links has been created we cound now download all the movie
+
+#+BEGIN_SRC shell :tangle robot.sh 
+MOVIE_DIR=/root/mio
+cd $MOVIE_DIR
+for i in "$MOVIE_DIR"/{Hindi,Malayalam,Tamil};do
+cd $i
+    for j in *; do
+    cd $j
+    echo  $j
+    if  [ ! -e "$i"/robot.txt ]
+    then
+        echo "Robot Does not exists !"
+        COUNTER=$(cat count)
+        while [ $COUNTER -lt `cat list | wc -l` ];do
+            sed -n $COUNTER,$(($COUNTER+10))p list | parallel -P 2 python3 ../../mio.py  >> log 2>&1
+            COUNTER=$(($COUNTER+10))
+            echo $COUNTER > count
+        done
+        touch robot.txt
+    else
+        echo "Robot Exsist !"
+    fi
+    cd ..
+    done
+cd ..
+done
+#+END_SRC
+
+
+Setting the ~MOVIE_DIR~ variable to the location to download and adding the script to the cronjob with ~@reboot~ to start the script at boot 
+it sits there downloading whole file . cronjob can be edited using ~crontab -e~
+
+
+
+
