@@ -3,12 +3,15 @@
 Who likes to downlaod music one by one we are too lazy , we script . This is a script i wrote to download music from [[http://mio.to/][MusicIndiaOnline]] . 
 This site contain a large repositories of Indian Music and the service is free . It plays the music in a custom player . 
 Opening the firefox web developer option and inspecting we could see the mp3 request links . intestingly there is pattern in the link
+
 #+BEGIN_EXAMPLE
 http://media-audio.mio.to/various_artists/A/Aashiqui 2 (2013)/1_1 - Tum Hi Ho-vbr-V5.mp3
 
 http://media-audio.mio.to/by_artist/A/AR. Rahman/I (2014)/1_1 - Mersalaayitten-vbr-V5.mp3
 #+END_EXAMPLE
+
 by looking into the source html we could extract all the informations to create the link
+
 #+BEGIN_EXAMPLE
 http://media-audio.mio.to/< by_artist or various_artists >/< first letter of album_id >/< album_id >/< disk_number >_< track_number > - < track_name >-vbr-V5.mp3
 #+END_EXAMPLE
@@ -38,8 +41,11 @@ and gives a interactive shell.
 there are three funtion new() , search_album() , download()
 
 new() -- load the new music from Hindi Malayalam and Tamil Category
+
 search_album() -- takes a string as argument and searches the string in mio.to and loads the top five result 
+
 download()  -- shows all the loaded link and promt for the index number of the movie to be downloaded
+
 
 a global variable is declared to to store the the result of new() and search_album() then calling 
 download to download any of the loaded link
@@ -67,5 +73,6 @@ to download the one from the list
 ** More Detail
 
 [[https://vishnudevtj.github.io/notes/mio][Downloading Songs !! · The Plain Text]]
+
 [[https://vishnudevtj.github.io/notes/downloading-interactively][Downloading Interactively · The Plain Text]]
 
