@@ -1,3 +1,5 @@
+# As all the links has been created we cound now download all the movie
+
 MOVIE_DIR=/root/mio
 cd $MOVIE_DIR
 for i in "$MOVIE_DIR"/{Hindi,Malayalam,Tamil};do

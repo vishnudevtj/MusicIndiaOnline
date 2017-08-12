@@ -1,3 +1,6 @@
+# List all movies in that catagory
+# Syntax python3 list.py <catogory_url>
+# example :  Syntax python3 list.py http://mio.to/Hindi/Movie+Songs/albums/decade/2010
 import requests,bs4,sys
 url = sys.argv[1]
 while True:
