@@ -1,0 +1,70 @@
+* Music India Online Download script
+
+Who likes to downlaod music one by one we are too lazy , we script . This is a script i wrote to download music from [[http://mio.to/][MusicIndiaOnline]] . 
+This site contain a large repositories of Indian Music and the service is free . It plays the music in a custom player . 
+Opening the firefox web developer option and inspecting we could see the mp3 request links . intestingly there is pattern in the link
+
+> "~http://media-audio.mio.to/various_artists/A/Aashiqui 2 (2013)/1_1 - Tum Hi Ho-vbr-V5.mp3~"
+
+>  ~" http://media-audio.mio.to/by_artist/A/AR. Rahman/I (2014)/1_1 - Mersalaayitten-vbr-V5.mp3 "~
+
+by looking into the source html we could extract all the informations to create the link
+
+> ~"http://media-audio.mio.to/< by_artist or various_artists >/< first letter of album_id >/< album_id >/< disk_number >_< track_number > - < track_name >-vbr-V5.mp3 "~
+
+so we scrap the webpage using [[ https://www.crummy.com/software/BeautifulSoup/bs4/doc/ ][BeautifulSoup]] and extract all the details . the source contains the artwork link from which we can get
+wether it is ~by_artist~ or ~various_artists~ by search with Regular expression final we create the link and download the file to its 
+respective folder . the mp3 file downloaded does not contain any tag so we add them using a [[http://eyed3.nicfit.net/][eyed3]] which is a tag editor
+
+This script requires BeautifulSoup and eyed3
+install dependencies
+
+#+BEGIN_SRC sh
+sudo pip3 install bs4
+sudo apt install eyed3
+#+END_SRC
+
+
+** Making My Music Download interactive
+
+The python script i last made to download the music from mio.to was designed in such a way that it download songs when the album link
+was given . Because then it was to Download all the music from the site and an interactive interface was not required .
+The list.py created a list of all the movies in a perticular category and shell scripting was used to automatically download
+all the music from this list . Now I think that it should be made interactive , so  I changed the script to and added the ebility 
+to search from their site and crab the link of the search result . python have an -i option which executes all the code in the file
+and gives a interactive shell.  
+
+there are three funtion new() , search_album() , download()
+
+new() -- load the new music from Hindi Malayalam and Tamil Category
+search_album() -- takes a string as argument and searches the string in mio.to and loads the top five result 
+download()  -- shows all the loaded link and promt for the index number of the movie to be downloaded
+
+a global variable is declared to to store the the result of new() and search_album() then calling 
+download to download any of the loaded link
+
+#+BEGIN_SRC 
+python3 -i mio_Interactive.py
+#+END_SRC
+
+to list all the new release 
+
+#+BEGIN_EXAMPLE
+>>> new()
+#+END_EXAMPLE
+
+to search an album 
+#+BEGIN_EXAMPLE
+>>> search_album("Aashiqui")
+#+END_EXAMPLE
+
+to download the one from the list
+#+BEGIN_EXAMPLE
+>>> download()
+#+END_EXAMPLE
+
+** More Detail
+
+[[https://vishnudevtj.github.io/notes/mio][Downloading Songs !! · The Plain Text]]
+[[https://vishnudevtj.github.io/notes/downloading-interactively][Downloading Interactively · The Plain Text]]
+
