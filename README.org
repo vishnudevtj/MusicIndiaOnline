@@ -3,14 +3,15 @@
 Who likes to downlaod music one by one we are too lazy , we script . This is a script i wrote to download music from [[http://mio.to/][MusicIndiaOnline]] . 
 This site contain a large repositories of Indian Music and the service is free . It plays the music in a custom player . 
 Opening the firefox web developer option and inspecting we could see the mp3 request links . intestingly there is pattern in the link
+#+BEGIN_EXAMPLE
+http://media-audio.mio.to/various_artists/A/Aashiqui 2 (2013)/1_1 - Tum Hi Ho-vbr-V5.mp3
 
-> "~http://media-audio.mio.to/various_artists/A/Aashiqui 2 (2013)/1_1 - Tum Hi Ho-vbr-V5.mp3~"
-
->  ~" http://media-audio.mio.to/by_artist/A/AR. Rahman/I (2014)/1_1 - Mersalaayitten-vbr-V5.mp3 "~
-
+http://media-audio.mio.to/by_artist/A/AR. Rahman/I (2014)/1_1 - Mersalaayitten-vbr-V5.mp3
+#+END_EXAMPLE
 by looking into the source html we could extract all the informations to create the link
-
-> ~"http://media-audio.mio.to/< by_artist or various_artists >/< first letter of album_id >/< album_id >/< disk_number >_< track_number > - < track_name >-vbr-V5.mp3 "~
+#+BEGIN_EXAMPLE
+http://media-audio.mio.to/< by_artist or various_artists >/< first letter of album_id >/< album_id >/< disk_number >_< track_number > - < track_name >-vbr-V5.mp3
+#+END_EXAMPLE
 
 so we scrap the webpage using [[ https://www.crummy.com/software/BeautifulSoup/bs4/doc/ ][BeautifulSoup]] and extract all the details . the source contains the artwork link from which we can get
 wether it is ~by_artist~ or ~various_artists~ by search with Regular expression final we create the link and download the file to its 
