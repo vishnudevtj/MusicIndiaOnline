@@ -2,7 +2,8 @@
 
 Who likes to downlaod music one by one we are too lazy , we script . This is a script i wrote to download music from [[http://mio.to/][MusicIndiaOnline]] . 
 This site contain a large repositories of Indian Music and the service is free . It plays the music in a custom player . 
-Opening the firefox web developer option and inspecting we could see the mp3 request links . intestingly there is pattern in the link
+Opening the firefox web developer option and inspecting we could see the mp3 request links . intestingly there is pattern in the link.
+The music can be easily downloaded by writing a script because the website does not have any proper like captha against robots.
 
 #+BEGIN_EXAMPLE
 http://media-audio.mio.to/various_artists/A/Aashiqui 2 (2013)/1_1 - Tum Hi Ho-vbr-V5.mp3
