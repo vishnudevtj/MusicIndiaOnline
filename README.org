@@ -1,6 +1,6 @@
 * Music India Online Download script
 
-Who likes to downlaod music one by one we are too lazy , we script . This is a script i wrote to download music from [[http://mio.to/][MusicIndiaOnline]] . 
+Who likes to downlaod music one by one we are too lazy , we script. This is a script i wrote to download music from [[http://mio.to/][MusicIndiaOnline]] . 
 This site contain a large repositories of Indian Music and the service is free . It plays the music in a custom player . 
 Opening the firefox web developer option and inspecting we could see the mp3 request links . intestingly there is pattern in the link.
 The music can be easily downloaded by writing a script because the website does not have any proper like captha against robots.
@@ -30,7 +30,7 @@ sudo apt install eyed3
 #+END_SRC
 
 
-** Making My Music Download interactive
+** Making My Music Download interactive (cool)
 
 The python script i last made to download the music from mio.to was designed in such a way that it download songs when the album link
 was given . Because then it was to Download all the music from the site and an interactive interface was not required .
