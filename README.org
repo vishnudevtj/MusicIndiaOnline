@@ -71,7 +71,7 @@ to download the one from the list
 >>> download()
 #+END_EXAMPLE
 
-** More Detail
+** More Detail Here
 
 [[https://vishnudevtj.github.io/notes/mio][Downloading Songs !! · The Plain Text]]
 
